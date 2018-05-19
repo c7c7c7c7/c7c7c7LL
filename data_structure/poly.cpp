@@ -93,4 +93,8 @@ struct Polynomial {
     for (int i = c.size() - 1; i >= 0; i--) ans *= x, ans += c[i];
     return ans;
   }
+  Polynomial PolynomialGCD(Polynomial a, Polynomial b) {
+    if (b.size() == 1 && b[0] == 0) { a.reduce(); return a; }
+    return PolynomialGCD(b, a % b);
+  }
 };
