@@ -1,0 +1,17 @@
+// 約数の総和　公式
+
+2^3 * 3^1
+
+( 2^0 + 2^1 + 2^2 + 2^3 ) *  ( 1 + 3^1 )
+
+
+//　包除原理
+
+奇数の組み合わせ　＋
+偶数の組み合わせ　ー
+
+// Tex
+
+1~xの和がY以上なら　1~xの組み合わせでYを表現できる
+
+https://y.qq.com/portal/search.html#page=1&searchid=1&remoteplace=txt.yqq.top&t=song&w=%E9%AD%94%E7%8E%8B
