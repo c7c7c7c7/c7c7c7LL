@@ -4,7 +4,7 @@ using namespace std;
 // semi-open   Range minimum query
 
 struct RSQ{
-  int n=(1<<17),data[(1<<18)];
+  int n=(1<<18),data[(1<<19)];
   RSQ(){
     memset(data,0,sizeof(data));
   }
@@ -41,7 +41,7 @@ struct RSQ{
   }
   //K番目に小さい値
   int K_number(int k){
-    int l = 0,r = (1<<19);
+    int l = 0,r = (1<<18)+1;
     while( l < r ) {
       int mid = (l+r) / 2;
       if( sum( 1 , mid+1 ) >= k ) r = mid;
@@ -51,7 +51,7 @@ struct RSQ{
   }
   //K番目に大きい値
   int K_L_number(int k){
-    int p=sum(1,(1<<9));
+    int p=sum(1,(1<<18));
     return K_number(p-k+1);
   }
 };

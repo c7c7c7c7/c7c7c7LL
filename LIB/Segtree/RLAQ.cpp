@@ -5,8 +5,8 @@ struct RLAQ{
   int sst[1<<18];
   int adt[1<<18];
   RLAQ(){
-    fill(sst,sst+(1<<18),INT_MAX);
-    fill(adt,adt+(1<<18),INT_MAX);
+    fill(sst,sst+(1<<18),0);
+    fill(adt,adt+(1<<18),0);
   }
   void add(int p, int q, int x, int k=0, int l=0, int r=(1<<17)){
     if(r <= p || q <= l) return;

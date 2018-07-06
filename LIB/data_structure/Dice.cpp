@@ -44,7 +44,6 @@ struct Dice{
       s[5]=s[1];
       s[1]=b;
     }
-    
     // migi neji (not verified)
     if(c=='R'){
       b=s[1];
@@ -60,7 +59,6 @@ struct Dice{
       s[4]=s[3];
       s[3]=b;
     }
-    
   }
   int top() {
     return s[0];
@@ -71,22 +69,6 @@ struct Dice{
     return res;
   }
 };
-vector<Dice> makeDices(Dice d){
-  vector<Dice> res;
-  for(int i=0;i<6;i++){
-    Dice t(d);
-    if(i==1) t.roll('N'); 
-    if(i==2) t.roll('S'); 
-    if(i==3) t.roll('S'),t.roll('S');
-    if(i==4) t.roll('L'); 
-    if(i==5) t.roll('R'); 
-    for(int k=0;k<4;k++){
-      res.push_back(t);
-      t.roll('E');
-    }
-  }
-  return res;
-}
 //END CUT HERE
 
 signed main(){

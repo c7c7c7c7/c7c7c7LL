@@ -5,7 +5,8 @@ typedef double D;      // 座標値の型。doubleかlong doubleを想定
 typedef complex<D> P;  // Point
 typedef pair<P, P> L;  // Line
 typedef vector<P> VP;
-const D EPS = 1e-9;    // 許容誤差。問題によって変える
+typedef vector<VP> Vcon;
+const D EPS = 1e-7;    // 許容誤差。問題によって変える
 #define X real()
 #define Y imag()
 #define LE(n,m) ((n) < (m) + EPS)
@@ -245,15 +246,35 @@ P minEnclosingCircle(const VP& ps) {
 // p1を原点とした時にpをcounter clockwiseで回転させた座標
 // D radi=acos((a*a+b*b-c*c)/(2*a*b));
 // radi=radi/M_PI*180;   /---これ忘れないで---/
+/*
 P rot(P p, double a,P p1){
   a=a*M_PI/180.0;
   p-=p1;
   return P(p.X*cos(a)+p.Y*(-sin(a))+x,p.X*sin(a)+p.Y*cos(a)+y);
 }
+*/
 // (a*a+b*b-c*c)/(2*a*b) = cos X 余弦定理
 // acos(X) = ラジアンー＞角度
 
 /* 多角形 */
+
+P mae_syori(P p1, P p2, P Q){
+  double xa,ya,xb,yb,t1,t2;
+  P R;
+  xa=Q.X-p1.X,ya=Q.Y-p1.Y;
+  xb=p2.X-p1.X,yb=p2.Y-p1.Y;
+  t1=xa*xb+ya*yb,t2=xb*xb+yb*yb;
+  R=P(2*(p1.X+xb*t1/t2)-Q.X,2*(p1.Y+yb*t1/t2)-Q.Y);
+  return R;
+}
+// 直線abから左側にh離れた直線
+L parallel_line(P a,P b,double h){
+    double t = atan((a.Y-b.Y)/(a.X-b.X));
+    P a_=P(a.X + h*cos(t+M_PI/2), a.Y + h*sin(t+M_PI/2));
+    P b_=P(b.X + h*cos(t+M_PI/2), b.Y + h*sin(t+M_PI/2));
+    if(ccw(a,b,a_)==-1)a_=mae_syori(a,b,a_),b_=mae_syori(a,b,b_);  // -1ならabを左側にhだけ移動
+    return make_pair(a_,b_);
+}
  
 // 頂点の順序（sortやmax_elementに必要）
 namespace std {
@@ -348,6 +369,69 @@ VP convexCut(const VP& ps, P a1, P a2) {
     if (ccwc * ccwn == -1) ret.push_back(crosspointLL(a1, a2, ps[i], ps[(i + 1) % n]));
   }
   return ret;
+}
+D area(const VP&);
+bool isec_CS(const VP& ps, P a1, P a2){
+  rep(i,ps.size()){
+    if(isecLS(ps[i],ps[(i+1)%ps.size()],a1,a2))return true;
+  }
+  return false;
+}
+
+void divide_convex(VP ps,const VP &s1,const VP &s2,Vcon &V){
+  bool flag = false;
+  for(int i=0;i<s1.size();i++){
+    VP convex_1=convexCut(ps,s1[i],s2[i]);
+    VP convex_2=convexCut(ps,s2[i],s1[i]);
+    if(area(convex_1)<EPS||area(convex_2)<EPS)continue;
+    divide_convex(convex_1,s1,s2,V);
+    divide_convex(convex_2,s1,s2,V);
+    flag = true;
+    break;
+  }
+  if(!flag) V.push_back(ps);
+  return;
+}
+
+// 多角形a1が凸多角形a2を内包してるか 多少手抜き
+bool con_in_con(VP a1,VP a2){
+  int p=0;
+  rep(j,a2.size()){
+    if(inPolygon(a1,a2[j])==0)return 0;
+    if(inPolygon(a1,(a2[j]+a2[(j+1)%a2.size()])/2.0)==0)return 0;
+  }
+  return 1;
+}
+
+// 全く同じ辺を共有してれば１を返す。
+bool isecCC(VP a1,VP a2){
+  rep(i,a1.size()){
+    rep(j,a2.size()){
+      P e1=a1[i];
+      P e2=a1[(i+1)%a1.size()];
+      P e3=a2[j];
+      P e4=a2[(j+1)%a2.size()];
+      if(abs(e1-e3)<EPS&&abs(e2-e4)<EPS)return 1;
+      if(abs(e1-e4)<EPS&&abs(e2-e3)<EPS)return 1;
+    }
+  }
+  return 0;
+}
+
+// 頂点抜き
+vector<vector<int> > Convex_arrangement(const Vcon& ps){
+  int n=ps.size();
+  vector<vector<int> >V(n,vector<int>(n));
+  rep(i,n)rep(j,n)V[i][j]=1e8;
+  rep(i,n){
+    for(int j=i+1;j<n;j++){
+      if(isecCC(ps[i],ps[j])){
+        V[i][j]=1;
+        V[j][i]=1;
+      }
+    }
+  }
+  return V;
 }
  
 // 凸多角形の直径（最遠点対）
